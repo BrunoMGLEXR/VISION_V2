@@ -1,0 +1,56 @@
+# ==========================================
+# ROS 2 colcon workspaces
+# ==========================================
+build/
+install/
+log/
+*/build/
+*/install/
+*/log/
+
+# ==========================================
+# Python / Entornos Virtuales
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env/
+.venv/
+
+# ==========================================
+# Edge AI / Modelos Pesados (¡CRÍTICO!)
+# ==========================================
+# No subas modelos a GitHub, la gente debe descargarlos
+*.npz
+*.onnx
+*.engine
+*.pb
+*.h5
+*.pt
+*.pth
+weights/
+models/
+
+# ==========================================
+# Third Party (Librerías de terceros)
+# ==========================================
+# Evitamos subir compilados que estén dentro de third_party
+third_party/*/build/
+third_party/*/install/
+third_party/*/log/
+third_party/**/*.so
+
+# ==========================================
+# Archivos de SO y Editores
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+*.whl

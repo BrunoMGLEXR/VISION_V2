@@ -1,0 +1,5 @@
+sensor_msgs/Image person_image
+---
+bool detected_helmet
+bool detected_vest
+bool detected_boots
