@@ -53,4 +53,12 @@ third_party/**/*.so
 *.swo
 .DS_Store
 
+# Wheels de terceros (pesados, específicos de plataforma)
 *.whl
+
+# Logs sueltos de build
+build.log
+*.log
+
+# Cuarentena de reorganización (revisar y borrar después)
+_CUARENTENA/

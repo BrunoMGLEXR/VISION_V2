@@ -20,7 +20,7 @@ from ament_index_python.packages import get_package_share_directory
 
 # === INICIO DEL PARCHE EDGE AI (JETSON) ===
 # Engañamos a la librería albumentations inyectando los atributos de OpenCV 4.5+ 
-# en nuestro OpenCV 4.1 nativo para que InsightFace no colapse al importarse.
+# en nuestro OpenCV 4.1 nativo para que InsightFace no colapse al importarse. MODIFICAR CUANDO SE TENGA LA JETSON
 if not hasattr(cv2, 'INTER_NEAREST_EXACT'):
     cv2.INTER_NEAREST_EXACT = cv2.INTER_NEAREST
 if not hasattr(cv2, 'INTER_LINEAR_EXACT'):

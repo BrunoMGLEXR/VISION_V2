@@ -1,2 +1,2 @@
-int32 track_id
+string track_id
 sensor_msgs/Image image
