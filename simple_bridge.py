@@ -4,8 +4,10 @@ import multiprocessing as mp
 import rclpy
 import signal
 import queue
-from rclpy.utilities import get_rmw_implementation_identifier
 from vigilance_interfaces.msg import AlarmReport
+# Importar librería si se quiere saber que el RMW es efectivo
+# from rclpy.utilities import get_rmw_implementation_identifier
+
 
 def run_domain_99_subscriber(q_alarm, shutdown_event):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -18,11 +20,9 @@ def run_domain_99_subscriber(q_alarm, shutdown_event):
     
     def alarm_callback(msg):
         q_alarm.put(msg)
-        
     node.create_subscription(AlarmReport, '/alarms/raw', alarm_callback, 10)
-    
     node.get_logger().info('Puente [RX] escuchando ALARMAS en Dominio 99...')
-    node.get_logger().info(f'RMW efectivo: {get_rmw_implementation_identifier()}')
+    # node.get_logger().info(f'RMW efectivo: {get_rmw_implementation_identifier()}')
     while rclpy.ok() and not shutdown_event.is_set():
         rclpy.spin_once(node, timeout_sec=0.1)
 
@@ -52,11 +52,9 @@ def run_domain_0_publisher(q_alarm, shutdown_event):
                 break
             pub_alarm.publish(msg)
             node.get_logger().info('¡Alarma reenviada al Dominio 0!')
-            
-            
     node.create_timer(0.1, timer_callback)
     node.get_logger().info('Puente [TX] publicando ALARMAS en Dominio 0...')
-    node.get_logger().info(f'RMW efectivo: {get_rmw_implementation_identifier()}')
+    # node.get_logger().info(f'RMW efectivo: {get_rmw_implementation_identifier()}')
     while rclpy.ok() and not shutdown_event.is_set():
         rclpy.spin_once(node, timeout_sec=0.1)
 
