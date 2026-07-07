@@ -5,7 +5,7 @@ import rclpy
 import signal
 import queue
 from vigilance_interfaces.msg import AlarmReport
-# Importar librería si se quiere saber que el RMW es efectivo
+# Importar librería para verificar qué implementación DDS usa realmente cada proceso (diagnóstico de mismatch host/contenedor)
 # from rclpy.utilities import get_rmw_implementation_identifier
 
 

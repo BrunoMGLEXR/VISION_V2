@@ -18,7 +18,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PersonCrop.msg"
   "msg/RobotLog.msg"
   "msg/AlarmReport.msg"
-  DEPENDENCIES sensor_msgs builtin_interfaces
+  "msg/TrackArray.msg"
+  "msg/TrackedPerson.msg"
+  DEPENDENCIES sensor_msgs builtin_interfaces std_msgs
 )
 
 ament_export_dependencies(rosidl_default_runtime)
