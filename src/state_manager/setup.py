@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'state_manager_node = state_manager.state_manager_node:main',
+            'track_simulator = state_manager.track_simulator_node:main',
         ],
     },
 )

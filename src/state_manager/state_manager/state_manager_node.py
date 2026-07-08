@@ -34,6 +34,7 @@ class TrackState:
     last_seen: float = 0.0                # timestamp de última detección (olvido geométrico)
     last_bbox: Optional[tuple] = None
     auth_requested: bool = False          # evita re-pedir autenticación repetidamente
+    visibility: str = "Visible"           # "Visible" / "RecentlyLost" / "Forgotten"
     # RESERVADO para Re-ID futuro (no usar en MVP)
     appearance_embedding: Optional[object] = None
 
@@ -71,7 +72,8 @@ class StateManagerNode(Node):
             tracks_qos,
         )
         self.get_logger().info('Suscrito a /perception/tracks')
-        # TODO Paso 3: doble mecanismo de olvido (timer geométrico + TTL de identidad)
+        # --- Paso 3: timer de purga (olvido geométrico + TTL) ---
+        self.forget_timer = self.create_timer(1.0, self._check_forgetting)
         # TODO Paso 4: blackboard - publisher a /biometrics/auth_request y
         #              subscriber a /biometrics/auth_status
         # TODO Paso 5: máquina de estados de alarma + timer de N segundos
@@ -97,13 +99,43 @@ class StateManagerNode(Node):
                 track = self.tracks[uuid]
                 track.last_seen = now
                 track.last_bbox = bbox
-            #self.get_logger().info(
-            #    f'Tracks activos: {len(self.tracks)} | UUIDs: {list(self.tracks.keys())}'
-            #)
+                if track.visibility == "RecentlyLost":
+                    track.visibility = "Visible"
+                    self.get_logger().info(
+                        f'Track {track.track_uuid} -> Visible (reaparece)'
+                    ) 
+            self.get_logger().info(
+                f'Tracks activos: {len(self.tracks)} | UUIDs: {list(self.tracks.keys())}'
+            ) 
 
     def _check_forgetting(self):
-        # TODO Paso 3: olvido geométrico (last_seen) + TTL de identidad
-        pass
+        now = self.get_clock().now().nanoseconds * 1e-9
+        geometric_forget = self.get_parameter('geometric_forget_sec').value
+        identity_ttl = self.get_parameter('identity_cache_ttl_sec').value
+
+        to_forget = [] # UUIDs a purgar (recolectar, no borrrar durante iteración)
+
+        for track in self.tracks.values():
+            elapsed = now - track.last_seen
+            # Transición 1: Visible -> RecentlyLost (olvido geométrico)
+            if elapsed >= geometric_forget and track.visibility == "Visible":
+                track.visibility = "RecentlyLost"
+                self.get_logger().info(
+                    f'Track {track.track_uuid} -> RecentlyLost '
+                    f'(sin verse {elapsed:.1f}s)'
+                )
+            # Transición 2: RecentlyLost -> Forgotten (TTL de identidad expirado)
+            if elapsed >= identity_ttl and track.visibility == "RecentlyLost":
+                track.visibility = "Forgotten"
+                to_forget.append(track.track_uuid)
+                self.get_logger().info(
+                    f'Track {track.track_uuid} -> Forgotten '
+                    f'(sin verse {elapsed:.1f}s, TTL expirado) - purgado'
+                )
+        
+        # Purga fuera del bucle (evita modificar dict durante iteración)
+        for uuid in to_forget:
+            del self.tracks[uuid] 
 
     def _request_auth(self, track):
         # TODO Paso 4: publicar solicitud de autenticación biométrica
